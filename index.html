@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maze Game</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Home Page UI -->
+  <div class="home-container">
+    <div class="title">Maze Game</div>
+    <p class="description">Navigate through the maze and reach the exit as quickly as possible. Each time you win, the maze gets harder!</p>
+    <button class="play-btn" onclick="startGame()">Play</button>
+    <button class="rules-btn" onclick="showRules()">Rules</button>
+    <div class="footer">The ultimate maze challenge awaits!</div>
+  </div>
+
+  <!-- Rules Section -->
+  <div class="rules-container" id="rulesContainer">
+    <div class="rules-title">Game Rules</div>
+    <ul class="rules-list">
+      <li>Use the arrow keys to move your player through the maze.</li>
+      <li>Your goal is to reach the red exit square.</li>
+      <li>Each time you win, the maze becomes larger and more challenging.</li>
+      <li>The minimum time to win is displayed at the top of the game screen.</li>
+    </ul>
+    <button class="back-btn" onclick="hideRules()">Back</button>
+  </div>
+
+  <!-- Game Canvas -->
+  <div class="game-container" id="gameContainer">
+    <div class="game-header">
+      <div class="info" id="minTimeInfo">Min time to win: 0 sec</div>
+      <div class="score" id="scoreInfo">Score: 0</div>
+      <button class="settings-btn" onclick="toggleControlPosition()">
+        <img src="assets/settings.png" alt="Settings">
+      </button>
+    </div>
+    <canvas id="mazeCanvas"></canvas>
+  </div>
+
+  <div class="mobile-controls">
+    <button class="control-btn" onclick="movePlayer('up')">
+      <img src="assets/up.png" alt="Up">
+    </button>
+    <div class="horizontal-controls">
+      <button class="control-btn" onclick="movePlayer('left')">
+        <img src="assets/left.png" alt="Left">
+      </button>
+      <button class="control-btn" onclick="movePlayer('right')">
+        <img src="assets/right.png" alt="Right">
+      </button>
+    </div>
+    <button class="control-btn" onclick="movePlayer('down')">
+      <img src="assets/down.png" alt="Down">
+    </button>
+  </div>
+
+  <div id="orientationMessage" class="orientation-message">
+    Please rotate your device to landscape mode to play the game.
+  </div>
+
+  <!-- Popup Window -->
+  <div id="popup" class="popup">
+    <div class="popup-content">
+      <p id="popupMessage"></p>
+      <button class="popup-btn" onclick="closePopup()">OK</button>
+    </div>
+  </div>
+
+  <script src="js/game.js"></script>
+</body>
+</html>

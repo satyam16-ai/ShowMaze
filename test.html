@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maze Game</title>
+  <style>
+    /* General page styling */
+    body, html {
+      margin: 0;
+      padding: 0;
+      font-family: 'Arial', sans-serif;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #6e7f80, #4e585a);
+      color: #fff;
+      text-align: center;
+    }
+
+    /* Container for the Home Page */
+    .home-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      max-width: 600px;
+      padding: 20px;
+      border-radius: 10px;
+      background-color: rgba(0, 0, 0, 0.5);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Game Title Styling */
+    .title {
+      font-size: 3rem;
+      font-weight: bold;
+      color: #f8f8f8;
+      margin-bottom: 20px;
+    }
+
+    /* Play Button Styling */
+    .play-btn {
+      font-size: 1.5rem;
+      padding: 15px 30px;
+      color: #fff;
+      background-color: #32C832;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .play-btn:hover {
+      background-color: #2b9b29;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+    }
+
+    .play-btn:active {
+      transform: translateY(2px);
+    }
+
+    /* Style for the footer or other text if needed */
+    .footer {
+      font-size: 1rem;
+      margin-top: 20px;
+      color: #dcdcdc;
+    }
+
+    /* Hidden canvas for game (initially not visible on home page) */
+    .game-container {
+      display: none;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Home Page UI -->
+  <div class="home-container">
+    <div class="title">Maze Game</div>
+    <button class="play-btn" onclick="startGame()">Play</button>
+    <div class="footer">The ultimate maze challenge awaits!</div>
+  </div>
+
+  <!-- Hidden Game Canvas (game starts when Play button is clicked) -->
+  <div class="game-container" id="gameContainer">
+    <canvas id="mazeCanvas"></canvas>
+  </div>
+
+  <script>
+    // Home page functionality and game start logic
+    function startGame() {
+      document.querySelector('.home-container').style.display = 'none';  // Hide home page
+      document.querySelector('.game-container').style.display = 'block';  // Show game canvas
+      initGame();
+    }
+
+    // Game initialization logic
+    const canvas = document.getElementById("mazeCanvas");
+    const ctx = canvas.getContext("2d");
+
+    const CELL_SIZE = 20;
+    let COLS = 21;
+    let ROWS = 21;
+    canvas.width = COLS * CELL_SIZE;
+    canvas.height = ROWS * CELL_SIZE;
+
+    const WALL_COLOR = "#000000";
+    const PATH_COLOR = "#DCDCDC";
+    const PLAYER_COLOR = "#32C832";
+    const EXIT_COLOR = "#FF5733";
+
+    let maze = Array.from({ length: ROWS }, () => Array(COLS).fill(0));
+    let player = { x: 1, y: 1 };
+    let exit = { x: COLS - 2, y: ROWS - 2 };
+
+    const DIRS = [
+      [0, -2], [0, 2],
+      [-2, 0], [2, 0]
+    ];
+
+    function generateMaze(x = 1, y = 1) {
+      maze[y][x] = 1;
+      const dirs = [...DIRS].sort(() => Math.random() - 0.5);
+
+      for (let [dx, dy] of dirs) {
+        const nx = x + dx;
+        const ny = y + dy;
+        if (nx > 0 && nx < COLS - 1 && ny > 0 && ny < ROWS - 1 && maze[ny][nx] === 0) {
+          maze[y + dy / 2][x + dx / 2] = 1;
+          generateMaze(nx, ny);
+        }
+      }
+    }
+
+    function drawMaze() {
+      for (let y = 0; y < ROWS; y++) {
+        for (let x = 0; x < COLS; x++) {
+          ctx.fillStyle = maze[y][x] === 1 ? PATH_COLOR : WALL_COLOR;
+          ctx.fillRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+        }
+      }
+    }
+
+    function drawPlayer() {
+      ctx.fillStyle = PLAYER_COLOR;
+      ctx.fillRect(player.x * CELL_SIZE, player.y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+    }
+
+    function drawExit() {
+      ctx.fillStyle = EXIT_COLOR;
+      ctx.fillRect(exit.x * CELL_SIZE, exit.y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+    }
+
+    function isWalkable(x, y) {
+      return x >= 0 && y >= 0 && x < COLS && y < ROWS && maze[y][x] === 1;
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawMaze();
+      drawPlayer();
+      drawExit();
+    }
+
+    document.addEventListener("keydown", e => {
+      let dx = 0, dy = 0;
+      if (e.key === "ArrowLeft") dx = -1;
+      else if (e.key === "ArrowRight") dx = 1;
+      else if (e.key === "ArrowUp") dy = -1;
+      else if (e.key === "ArrowDown") dy = 1;
+
+      const nx = player.x + dx;
+      const ny = player.y + dy;
+
+      if (isWalkable(nx, ny)) {
+        player.x = nx;
+        player.y = ny;
+      }
+
+      if (player.x === exit.x && player.y === exit.y) {
+        alert("You won! Generating a harder maze...");
+        increaseDifficulty();
+      }
+
+      draw();
+    });
+
+    function increaseDifficulty() {
+      COLS += 2;
+      ROWS += 2;
+      canvas.width = COLS * CELL_SIZE;
+      canvas.height = ROWS * CELL_SIZE;
+      maze = Array.from({ length: ROWS }, () => Array(COLS).fill(0));
+      generateMaze();
+      player = { x: 1, y: 1 };
+      exit = { x: COLS - 2, y: ROWS - 2 };
+    }
+
+    function initGame() {
+      generateMaze();
+      draw();
+    }
+  </script>
+</body>
+</html>
