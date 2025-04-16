@@ -15,6 +15,20 @@ body, html {
     text-align: center;
 }
 
+/* Fullscreen Styling */
+body.fullscreen, html.fullscreen {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+}
+
+.game-container.fullscreen {
+    height: 100%;
+    width: 100%;
+}
+
 /* Container for the Home Page */
 .home-container {
     display: flex;

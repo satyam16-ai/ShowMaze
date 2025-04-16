@@ -247,6 +247,11 @@ document.querySelectorAll('.control-btn').forEach(button => {
     button.addEventListener('mouseleave', stopMovement); // Stop if the pointer leaves the button
     button.addEventListener('touchstart', () => startMovement(button.dataset.direction));
     button.addEventListener('touchend', stopMovement);
+    button.addEventListener('touchstart', e => {
+        e.preventDefault(); // Prevent the default long-press behavior
+        startMovement(button.dataset.direction);
+    });
+    button.addEventListener('contextmenu', e => e.preventDefault()); // Prevent the context menu
 });
 
 // Detect device orientation and show a message if not in landscape mode
@@ -365,3 +370,34 @@ function initGame() {
     const result = findMinTimeToWin();
     startTimer(result.timeInSeconds);
 }
+
+// Fullscreen toggle function
+function toggleFullscreen() {
+    const gameContainer = document.getElementById('gameContainer');
+    if (!document.fullscreenElement) {
+        if (gameContainer.requestFullscreen) {
+            gameContainer.requestFullscreen();
+        } else if (gameContainer.webkitRequestFullscreen) { // Safari
+            gameContainer.webkitRequestFullscreen();
+        } else if (gameContainer.msRequestFullscreen) { // IE11
+            gameContainer.msRequestFullscreen();
+        }
+    } else {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) { // Safari
+            document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) { // IE11
+            document.msExitFullscreen();
+        }
+    }
+}
+
+// Add a fullscreen button
+document.addEventListener('DOMContentLoaded', () => {
+    const fullscreenButton = document.createElement('button');
+    fullscreenButton.innerText = 'Fullscreen';
+    fullscreenButton.classList.add('fullscreen-btn');
+    fullscreenButton.onclick = toggleFullscreen;
+    document.body.appendChild(fullscreenButton);
+});
