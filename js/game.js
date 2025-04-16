@@ -201,6 +201,8 @@ document.addEventListener("keydown", e => {
     draw();
 });
 
+let movementInterval;
+
 // Handle on-screen button clicks for mobile controls
 function movePlayer(direction) {
     let dx = 0, dy = 0;
@@ -226,6 +228,26 @@ function movePlayer(direction) {
 
     draw();
 }
+
+// Start continuous movement when a button is pressed
+function startMovement(direction) {
+    movePlayer(direction); // Move once immediately
+    movementInterval = setInterval(() => movePlayer(direction), 100); // Move continuously every 100ms
+}
+
+// Stop continuous movement when the button is released
+function stopMovement() {
+    clearInterval(movementInterval);
+}
+
+// Add event listeners for button press and release
+document.querySelectorAll('.control-btn').forEach(button => {
+    button.addEventListener('mousedown', () => startMovement(button.dataset.direction));
+    button.addEventListener('mouseup', stopMovement);
+    button.addEventListener('mouseleave', stopMovement); // Stop if the pointer leaves the button
+    button.addEventListener('touchstart', () => startMovement(button.dataset.direction));
+    button.addEventListener('touchend', stopMovement);
+});
 
 // Detect device orientation and show a message if not in landscape mode
 function checkOrientation() {
